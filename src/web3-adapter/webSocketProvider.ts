@@ -187,7 +187,7 @@ export class AlchemyWebSocketProvider extends EventEmitter
     this.ws.addEventListener("message", this.handleMessage);
     this.ws.addEventListener("reopen", this.handleReopen);
     this.ws.addEventListener("down", this.stopHeartbeatAndBackfill);
-    this.ws.addEventListener("pong", this.handleHeartbeat);
+    this.ws.addEventListener("pong", () => this.handleHeartbeat());
   }
 
   private removeSocketListeners(): void {
@@ -206,7 +206,7 @@ export class AlchemyWebSocketProvider extends EventEmitter
     }
     this.isAlive = true;
 
-    this.heartbeatIntervalId = setInterval(async () => {
+    this.heartbeatIntervalId = setInterval(() => {
       if (!this.isAlive) {
         this.ws.reconnect();
       }

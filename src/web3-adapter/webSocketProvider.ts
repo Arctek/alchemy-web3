@@ -31,7 +31,6 @@ import {
 import { SendPayloadFunction } from "./sendPayload";
 
 const HEARTBEAT_INTERVAL = 30000;
-const HEARTBEAT_WAIT_TIME = 10000;
 const BACKFILL_TIMEOUT = 60000;
 const BACKFILL_RETRIES = 5;
 
@@ -107,6 +106,7 @@ export class AlchemyWebSocketProvider extends EventEmitter
   private readonly backfiller: Backfiller;
   private heartbeatIntervalId?: NodeJS.Timeout;
   private cancelBackfill = noop;
+  private isAlive = true;
 
   constructor(
     private readonly ws: SturdyWebSocket,
@@ -187,6 +187,7 @@ export class AlchemyWebSocketProvider extends EventEmitter
     this.ws.addEventListener("message", this.handleMessage);
     this.ws.addEventListener("reopen", this.handleReopen);
     this.ws.addEventListener("down", this.stopHeartbeatAndBackfill);
+    this.ws.addEventListener("pong", this.handleHeartbeat);
   }
 
   private removeSocketListeners(): void {
@@ -195,15 +196,23 @@ export class AlchemyWebSocketProvider extends EventEmitter
     this.ws.removeEventListener("down", this.stopHeartbeatAndBackfill);
   }
 
+  private handleHeartbeat() {
+    this.isAlive = true;
+  }
+
   private startHeartbeat = (): void => {
     if (this.heartbeatIntervalId != null) {
       return;
     }
+    this.isAlive = true;
+
     this.heartbeatIntervalId = setInterval(async () => {
-      try {
-        await withTimeout(this.send("web3_clientVersion"), HEARTBEAT_WAIT_TIME);
-      } catch {
+      if (!this.isAlive) {
         this.ws.reconnect();
+      }
+      else {
+        this.isAlive = false;
+        this.ws.ping();
       }
     }, HEARTBEAT_INTERVAL);
   };

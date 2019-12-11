@@ -59,16 +59,23 @@
     "ts-jest": "^24.0.2",
     "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.3",
+    "scrypt": "Arctek/node-scrypt",
+    "secp256k1": "Arctek/secp256k1-node"
   },
   "dependencies": {
     "@types/web3": "^1.0.18",
     "assert-never": "^1.2.0",
     "eventemitter3": "^3.1.2",
     "fetch-ponyfill": "^6.0.2",
-    "sturdy-websocket": "^0.2.1",
+    "sturdy-websocket": "Arctek/sturdy-websocket",
     "web3": "1.0.0-beta.55",
     "web3-providers": "1.0.0-beta.55",
     "websocket": "^1.0.28"
+  },
+    "resolutions": {
+    "**/sturdy-websocket": "Arctek/sturdy-websocket",
+    "**/secp256k1": "Arctek/secp256k1-node",
+    "**/scrypt": "Arctek/node-scrypt"
   }
 }
